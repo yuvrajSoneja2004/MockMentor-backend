@@ -15,13 +15,29 @@ let conversationHistory = [];
 router.post("/chat", async (req, res) => {
   // Conversation history array
 
+
   try {
-    const { message, candidateName, interviewerName } = req.body;
+    const {
+      message,
+      candidateName,
+      interviewerName,
+      roleForInterview,
+      difficulty,
+      language,
+    } = req.body;
     console.log(message, candidateName, interviewerName);
     // Save user message to conversation history
     conversationHistory.push({ role: "user", content: message });
     // You are a helpful assistant designed to output
-    const PROMPT_TEMPLATE = `Your name is ${interviewerName}, you are a professional software engineer for 20 years now and you are interviewing a person named ${candidateName} who is good in React.js and has 2 years of experience. Interview ${candidateName} without saying any other thing. Once the entire interview is over, give regards and at the end of the sentence, just write "{end}".`;
+    const PROMPT_TEMPLATE = `Your name is ${interviewerName}, you are a professional software engineer for 20 years now and you are interviewing a person named ${candidateName} for ${roleForInterview} role  and has 2 years of experience. interview difficulty will be ${difficulty} and it should be conducted in ${language} lnaguage Interview ${candidateName} without saying any other thing. Once the entire interview is over, give regards and at the end of the sentence, just write "{end}". when i say "SHOW_SCORE" then give me scores in the following array template.
+    [
+      {give score here}.
+      {give an array of tips for improvement}
+    ]
+    (your regards when interview is finished).
+    
+    again , dont forget to write "{end}" when its over.
+    `;
 
     // Get OpenAI response
     const completion = await openai.chat.completions.create({
