@@ -74,4 +74,19 @@ router.post("/chat", async (req, res) => {
   }
 });
 
+// Endpoint to clear conversation history
+router.post("/clearHistory", (req, res) => {
+  // Save the system message (first element) before clearing the array
+  console.log("its being hit")
+  const systemMessage = conversationHistory[0];
+
+  // Clear conversation history, keeping the system message
+  conversationHistory = [systemMessage];
+
+  res.json({
+    msg: "Conversation history cleared, except the system message",
+  });
+});
+
+
 module.exports = router;
