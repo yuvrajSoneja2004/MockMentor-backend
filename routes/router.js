@@ -15,7 +15,7 @@ let conversationHistory = [];
 router.post("/chat", async (req, res) => {
   // Conversation history array
 
-
+ 
   try {
     const {
       message,
@@ -24,12 +24,16 @@ router.post("/chat", async (req, res) => {
       roleForInterview,
       difficulty,
       language,
+      interviewerBehavior,
+      interviewerGender,
     } = req.body;
-    console.log(message, candidateName, interviewerName);
+    console.log(interviewerGender, interviewerBehavior);
     // Save user message to conversation history
     conversationHistory.push({ role: "user", content: message });
     // You are a helpful assistant designed to output
-    const PROMPT_TEMPLATE = `Your name is ${interviewerName}, you are a professional software engineer for 20 years now and you are interviewing a person named ${candidateName} for ${roleForInterview} role  and has 2 years of experience. interview difficulty will be ${difficulty} and it should be conducted in ${language} lnaguage Interview ${candidateName} without saying any other thing. Once the entire interview is over, give regards and at the end of the sentence, just write "{end}". when i say "SHOW_SCORE" then give me scores in the following array template.
+    const PROMPT_TEMPLATE = `Your name is ${interviewerName}, you are a ${
+      interviewerGender === "option-one" ? "Male" : "Female"
+    } professional software engineer for 20 years now and you are interviewing a person named ${candidateName} for ${roleForInterview} role  and has 2 years of experience. interview difficulty will be ${difficulty}. your behaviour towards ${candidateName} will be ${interviewerBehavior} and it should be conducted in ${language} language Interview ${candidateName} without saying any other thing. Once the entire interview is over, give regards and at the end of the sentence, just write "{end}". when i say "SHOW_SCORE" then give me scores in the following array template.
     [
       {give score here}.
       {give an array of tips for improvement}
@@ -39,19 +43,20 @@ router.post("/chat", async (req, res) => {
     again , dont forget to write "{end}" when its over.
     `;
 
-    // Get OpenAI response
     const completion = await openai.chat.completions.create({
       messages: [
         {
           role: "system",
           content: PROMPT_TEMPLATE,
         },
-        ...conversationHistory.map((msg) => {
-          return {
-            role: msg.role,
-            content: msg.content,
-          };
-        }),
+        ...conversationHistory
+          .filter((msg) => msg) // Filter out undefined elements
+          .map((msg) => {
+            return {
+              role: msg.role,
+              content: msg.content,
+            };
+          }),
       ],
       model: "gpt-3.5-turbo-1106",
     });
