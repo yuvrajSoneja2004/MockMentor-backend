@@ -5,6 +5,14 @@ const feedSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  userName: {
+    type: String,
+    default: "John Doe",
+  },
+  userProfilePic: {
+    type: String,
+    default: "NOT_DEFINED",
+  },
   conversation: {
     type: Array,
     required: true,

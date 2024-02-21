@@ -110,13 +110,15 @@ router.get("/getAllPosts", async (req, res) => {
 // Endpoint to Post conversation on feed
 router.post("/postFeed", async (req, res) => {
   try {
-    const { postDesc, conversation, tags } = req.body;
+    const { postDesc, conversation, tags, userName, userAvatar } = req.body;
 
     // Create a new instance of the 'Feed' model
     const newFeed = new Feed({
       postDesc,
       conversation,
       tags,
+      userName,
+      userProfilePic: userAvatar,
     });
 
     // Save the new feed to the MongoDB database
@@ -203,5 +205,65 @@ router.post("/postComment/:feedId", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Handle likes
+router.post("/like/:feedId", async (req, res) => {
+  try {
+    // Get Particular feed
+    const particularFeed = await Feed.findById(req.params.feedId);
+    // console.log(particularFeed);
+    if (particularFeed.likes.includes(req.body.email)) {
+      res.json({
+        res: false,
+        msg: "User already liked the post",
+      });
+      console.log("Already liked");
+    } else {
+      particularFeed.likes.push(req.body.email);
+      const saveNew = await particularFeed.save();
+      console.log("Success push");
+      res.status(200).json({
+        res: true,
+        msg: saveNew.likes.length,
+      });
+    }
+  } catch (error) {
+    console.log(error, "push err");
+  }
+});
+
+// Dislike feed
+router.post("/unlike/:feedId", async (req, res) => {
+  const { currentUserE } = req.body;
+  try {
+    const feed = await Feed.findById(req.params.feedId);
+
+    if (!feed.likes.includes(currentUserE)) {
+      res.json({
+        res: false,
+        msg: "This is bug",
+      });
+    } else {
+      feed.likes = feed.likes.filter((email) => {
+        return currentUserE != email;
+      });
+
+      const savedFeed = await feed.save();
+
+      if (savedFeed) {
+        console.log("Disliked Successfully");
+        res.json({
+          res: true,
+          msg: "Disliked Successfully",
+        });
+      }
+
+      console.log(finalLikesVersion, "ths is dislike thing");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 module.exports = router;

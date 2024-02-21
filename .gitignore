@@ -42,6 +42,7 @@ jspm_packages/
 # Output of 'npm pack'
 *.tgz
 
+/node_modules/
 # Yarn
 yarn-error.log
 .pnp.*
