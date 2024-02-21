@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
 let conversationHistory = [];
 router.post("/chat", async (req, res) => {
   // Conversation history array
-
+let a;
   try {
     const {
       message,
