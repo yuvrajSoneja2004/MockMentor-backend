@@ -4,7 +4,7 @@ const OpenAI = require("openai");
 const Feed = require("../models/post.model");
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPEN_AI_API_KEY,
 });
 
 router.get("/", (req, res) => {
